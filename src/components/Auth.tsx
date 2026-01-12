@@ -18,7 +18,7 @@ export const Auth = ({ setIsAuth }: { setIsAuth: (val: boolean) => void }) => {
       <p className="text-base sm:text-lg">Welcome to</p>
       <h1 className="flex flex-wrap justify-center text-3xl sm:text-4xl font-bold tracking-wide text-center leading-tight">
         &lt;
-        <span className="text-3xl sm:text-5xl text-purple-400">ℭʎ𝔟𝔢𝔯𝔇𝔢𝔳𝔰</span>
+        <span className="text-3xl sm:text-5xl text-purple-400">ℭʎ𝔟𝔢𝔯𝕾𝖖𝖚𝖆𝖉</span>
         /&gt;
       </h1>
       <button

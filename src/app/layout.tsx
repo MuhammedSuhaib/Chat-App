@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   manifest: "/manifest.json",
-  title: "<ℭʎ𝔟𝔢𝔯𝔇𝔢𝔳𝔰/>",
-  description: "A PWA chat app for <ℭʎ𝔟𝔢𝔯𝔇𝔢𝔳𝔰/>  ",
+  title: "<ℭʎ𝔟𝔢𝔯𝕾𝖖𝖚𝖆𝖉/>",
+  description: "A PWA chat app for <ℭʎ𝔟𝔢𝔯𝕾𝖖𝖚𝖆𝖉/>  ",
 };
 
 export default function RootLayout({
@@ -47,7 +47,7 @@ export default function RootLayout({
             <div className="flex justify-around items-center-safe">
               <Link href="/" >
                 <span className="flex flex-wrap justify-center text-2xl font-bold tracking-wide text-center leading-tight">
-                  &lt;<span className="text-1xl text-purple-400">ℭʎ𝔟𝔢𝔯𝔇𝔢𝔳𝔰</span>/&gt;
+                  &lt;<span className="text-1xl text-purple-400">ℭʎ𝔟𝔢𝔯𝕾𝖖𝖚𝖆𝖉</span>/&gt;
                 </span>
               </Link>
               <UserMenu />
