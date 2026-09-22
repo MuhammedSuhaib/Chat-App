@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { ThemeProvider } from "@/components/Theme-provider"
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { UserMenu } from "@/components/AvatarDropdown";
 import Link from "next/link";
+import { APP_NAME } from "@/lib/constants";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   manifest: "/manifest.json",
-  title: "<ℭʎ𝔟𝔢𝔯𝕾𝖖𝖚𝖆𝖉/>",
-  description: "A PWA chat app for <ℭʎ𝔟𝔢𝔯𝕾𝖖𝖚𝖆𝖉/>  ",
+  title: `<${APP_NAME}/>`,
+  description: `A PWA chat app for <${APP_NAME}/>`,
 };
 
 export default function RootLayout({
@@ -45,9 +45,9 @@ export default function RootLayout({
         >
           <div className="max-w-sm mx-auto space-y-4">
             <div className="flex justify-around items-center-safe">
-              <Link href="/" >
+              <Link href="/">
                 <span className="flex flex-wrap justify-center text-2xl font-bold tracking-wide text-center leading-tight">
-                  &lt;<span className="text-1xl text-purple-400">ℭʎ𝔟𝔢𝔯𝕾𝖖𝖚𝖆𝖉</span>/&gt;
+                  &lt;<span className="text-1xl text-purple-400">{APP_NAME}</span>/&gt;
                 </span>
               </Link>
               <UserMenu />

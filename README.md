@@ -34,6 +34,7 @@ A real-time chat application built with Next.js, Firebase, and TypeScript. Featu
 
 1. Clone this repository
 2. Install dependencies:
+
    ```bash
    pnpm install
    ```
@@ -41,6 +42,7 @@ A real-time chat application built with Next.js, Firebase, and TypeScript. Featu
 3. Set up Firebase configuration in `src/lib/firebase.ts`
 
 4. Run the development server:
+
    ```bash
    pnpm dev
    ```
@@ -91,6 +93,7 @@ src/
 ## Deployment
 
 This app is configured for deployment on Replit. The project includes:
+
 - Automatic dependency installation
 - Development server configuration
 - Firebase hosting setup
@@ -103,4 +106,10 @@ This app is configured for deployment on Replit. The project includes:
 4. Test thoroughly
 5. Submit a pull request
 
-## License
+# TODO
+
+- [ ] Fix chat UI: x-axis has unwanted scroll
+- [ ] Fix chat bubbles: floating left freely, no fixed/max width — constrain bubble width
+- [ ] Implement cookie-based auth (SSR/middleware) — switch from `localStorage` token to cookies for performance: enables server-side auth checks before page render instead of client-side flash/redirect. Leftover `import Cookies from "universal-cookie"` (commented) was the original attempt — finish wiring it up
+- [ ] Remove or wire up `rooms/actions.ts` (`joinRoom` server action) — currently unused, `rooms/page.tsx` uses client-side `handleSubmit` instead
+- [ ] Clean up `UserMenu.tsx`: `cookies.remove("auth-token")` does nothing since token is in `localStorage` — fix `handleSignOut` to use `localStorage.removeItem("auth-token")`, remove unused `Cookies` import

@@ -2,6 +2,8 @@
 
 import { auth, provider } from "../lib/firebase";
 import { signInWithPopup } from "firebase/auth";
+import { APP_NAME } from "@/lib/constants";
+
 // import Cookies from "universal-cookie";
 
 // const cookies = new Cookies();
@@ -18,7 +20,7 @@ export const Auth = ({ setIsAuth }: { setIsAuth: (val: boolean) => void }) => {
       <p className="text-base sm:text-lg">Welcome to</p>
       <h1 className="flex flex-wrap justify-center text-3xl sm:text-4xl font-bold tracking-wide text-center leading-tight">
         &lt;
-        <span className="text-3xl sm:text-5xl text-purple-400">ℭʎ𝔟𝔢𝔯𝕾𝖖𝖚𝖆𝖉</span>
+        <span className="text-3xl sm:text-5xl text-purple-400">{APP_NAME}</span>
         /&gt;
       </h1>
       <button

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import Cookies from "universal-cookie";
+// import Cookies from "universal-cookie";
 import { useTheme } from "next-themes";
 
 import {
@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-const cookies = new Cookies();
+// const cookies = new Cookies();
 
 export function UserMenu() {
   const [user, setUser] = useState(auth.currentUser);
@@ -29,7 +29,8 @@ export function UserMenu() {
 
   const handleSignOut = async () => {
     await signOut(auth);
-    cookies.remove("auth-token");
+    // cookies.remove("auth-token");
+    localStorage.removeItem("auth-token"); // old approch
     window.location.reload();
   };
 
