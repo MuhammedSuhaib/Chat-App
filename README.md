@@ -93,3 +93,21 @@ src/
 - `pnpm build` - Build production bundle & PWA service worker
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint code checks
+
+
+## NEXT
+- Testing
+
+
+
+
+
+
+
+
+
+
+
+
+
+
