@@ -1,4 +1,4 @@
-//? MessageBubble Component: renders individual message bubbles with alignment and media handlers
+//? MessageBubble: single chat bubble with media + secret edit/delete menu
 "use client";
 
 import { FileText, Trash2, Edit3, Play, Download } from "lucide-react";
@@ -11,32 +11,29 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import { Message, RoomChatProps } from "./types";
 
-// Props for MessageBubble extending common RoomChatProps
 interface Props extends RoomChatProps {
-  msg: Message; // The message object containing text, author details, timestamp, and optional media payload
+  msg: Message;
   onEdit: (id: string, text: string) => void;
 }
 
 export default function MessageBubble({ msg, room, theme, onEdit }: Props) {
-  // Determine if current logged in user is the author of this message
   const isMine = auth.currentUser?.uid === msg.userId;
 
   return (
-    <div className={`flex ${isMine ? "justify-end" : "justify-start"} group`}>
+    <div className={`flex ${isMine ? "justify-end" : "justify-start"} group w-full`}>
+      {/* Constrained bubble width so it never stretches full container */}
       <div
-        className={`flex flex-col max-w-[85%] ${isMine ? "items-end" : "items-start"}`}
+        className={`flex flex-col max-w-[75%] sm:max-w-[65%] ${isMine ? "items-end" : "items-start"}`}
       >
-        {/* User avatar & display name header */}
         <div
           className={`flex items-center gap-2 mb-1 ${isMine ? "flex-row-reverse" : "flex-row"}`}
         >
-          {/* Avatar menu trigger (allows Edit/Delete for user's own messages) */}
           <Popover>
             <PopoverTrigger asChild>
               <img
                 src={msg.photoURL}
                 alt="avatar"
-                className="size-8 rounded-full border border-white/10 cursor-pointer active:scale-90 transition-transform"
+                className="size-8 rounded-full border border-white/10 cursor-pointer active:scale-90 transition-transform shrink-0"
                 style={{
                   boxShadow: isMine ? `0 0 10px ${theme.text2}44` : "none",
                 }}
@@ -67,9 +64,8 @@ export default function MessageBubble({ msg, room, theme, onEdit }: Props) {
           </span>
         </div>
 
-        {/* Message Content Bubble Container */}
         <div
-          className={`p-3 rounded-2xl border transition-all duration-300 ${isMine ? "bg-zinc-900 border-white/5" : "bg-black/80 backdrop-blur-sm border-zinc-800"}`}
+          className={`p-3 rounded-2xl border transition-all duration-300 break-words ${isMine ? "bg-zinc-900 border-white/5" : "bg-black/80 backdrop-blur-sm border-zinc-800"}`}
           style={{
             borderLeft: !isMine
               ? `3px solid ${theme.text2}`
@@ -77,18 +73,17 @@ export default function MessageBubble({ msg, room, theme, onEdit }: Props) {
             boxShadow: isMine ? `0 4px 20px ${theme.text2}11` : "none",
           }}
         >
-          {/* Media Renderers */}
           {msg.mediaType === "image" && (
             <img
               src={msg.mediaData}
-              className="rounded-lg mb-2 max-h-64 shadow-lg border border-white/5"
+              className="rounded-lg mb-2 max-h-64 max-w-full shadow-lg border border-white/5"
               alt="Shared"
             />
           )}
           {msg.mediaType === "gif" && (
             <img
               src={msg.mediaData}
-              className="rounded-lg mb-2 max-h-64"
+              className="rounded-lg mb-2 max-h-64 max-w-full"
               alt="GIF"
             />
           )}
@@ -98,13 +93,13 @@ export default function MessageBubble({ msg, room, theme, onEdit }: Props) {
                 size={16}
                 style={{ fill: theme.text2, color: theme.text2 }}
               />
-              <audio src={msg.mediaData} controls className="h-8 opacity-70" />
+              <audio src={msg.mediaData} controls className="h-8 opacity-70 max-w-full" />
             </div>
           )}
           {msg.mediaType === "pdf" && (
             <div className="flex items-center gap-3 p-2 bg-zinc-800 rounded-lg mb-1 border border-white/10">
-              <FileText size={20} className="text-red-500" />
-              <span className="text-[10px] truncate max-w-[100px]">
+              <FileText size={20} className="text-red-500 shrink-0" />
+              <span className="text-[10px] truncate max-w-[120px]">
                 {msg.fileName}
               </span>
               <a href={msg.mediaData} download={msg.fileName} title="Download">
@@ -113,10 +108,9 @@ export default function MessageBubble({ msg, room, theme, onEdit }: Props) {
             </div>
           )}
 
-          {/* Text Content with URL Regex Parsing */}
           {msg.text && (
             <p
-              className="text-[14px] whitespace-pre-wrap leading-relaxed"
+              className="text-[14px] whitespace-pre-wrap leading-relaxed break-words"
               style={{ color: theme.text1 }}
             >
               {msg.text.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
@@ -136,7 +130,6 @@ export default function MessageBubble({ msg, room, theme, onEdit }: Props) {
             </p>
           )}
 
-          {/* Timestamp footer */}
           <div className="flex justify-between items-center mt-2 opacity-30 text-[9px] font-black uppercase tracking-widest">
             <span>{msg.createdAt?.toDate?.().toLocaleTimeString()}</span>
           </div>

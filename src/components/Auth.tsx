@@ -1,17 +1,18 @@
+//? Auth: Google sign-in screen that sets auth-token cookie
 "use client";
 
 import { auth, provider } from "../lib/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { APP_NAME } from "@/lib/constants";
+import Cookies from "universal-cookie";
 
-// import Cookies from "universal-cookie";
-
-// const cookies = new Cookies();
+const cookies = new Cookies();
 
 export const Auth = ({ setIsAuth }: { setIsAuth: (val: boolean) => void }) => {
   const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, provider);
-    localStorage.setItem("auth-token", result.user.refreshToken);
+    // store refresh token in cookie for persistence across sessions
+    cookies.set("auth-token", result.user.refreshToken, { path: "/" });
     setIsAuth(true);
   };
 
