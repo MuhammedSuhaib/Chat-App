@@ -102,18 +102,18 @@ export default function ChatInput({
           />
         </div>
 
-        {/* Action Button: Send message when text is present, or Hold Mic for Voice Note when input is empty */}
+        {/* Action Button: Send message when text is present, or Hold Mic for Voice Note */}
         <button
-          onClick={onSend}
+          onClick={input ? onSend : undefined}
           onPointerDown={input ? undefined : onStartRecord}
           onPointerUp={input ? undefined : onStopRecord}
           className={`p-3 rounded-full transition-all duration-300 shadow-xl ${isRecording ? "bg-red-600 scale-125 shadow-red-500/50" : ""}`}
           style={{
-            backgroundColor: input ? theme.text2 : "#18181b",
-            color: input ? "black" : "#52525b",
+            backgroundColor: input ? theme.text2 : isRecording ? "#dc2626" : "#18181b",
+            color: input ? "black" : isRecording ? "white" : "#52525b",
             boxShadow: input ? `0 0 15px ${theme.text2}66` : "none",
           }}
-          title={input ? "Send" : "Hold Mic"}
+          title={input ? "Send" : "Hold Mic to Record"}
           aria-label={input ? "Send" : "Microphone"}
         >
           {input ? (

@@ -79,17 +79,50 @@ export default function ChatHeader({
               />
             </div>
 
-            {/* Input field for custom wallpaper URL */}
+            {/* Background Image Options: Local File Upload or URL */}
             <div>
               <label className="text-[10px] uppercase font-bold text-zinc-500">
-                Background Image URL
+                Background Wallpaper
               </label>
-              <input
-                type="text"
-                className="w-full bg-black border border-zinc-700 p-2 text-xs mt-1 rounded"
-                placeholder="https://..."
-                onBlur={(e) => setTheme({ ...theme, bgImage: e.target.value })}
-              />
+              <div className="flex flex-col gap-2 mt-1">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        setTheme({ ...theme, bgImage: reader.result as string });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="text-xs text-zinc-400 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  className="w-full bg-black border border-zinc-700 p-2 text-xs rounded"
+                  placeholder="Or paste image URL (https://...)"
+                  onChange={(e) => setTheme({ ...theme, bgImage: e.target.value })}
+                />
+              </div>
+            </div>
+            {/* Enable Notifications Button */}
+            <div>
+              <button
+                onClick={async () => {
+                  if (typeof window !== "undefined" && "Notification" in window) {
+                    const res = await Notification.requestPermission();
+                    alert(`Notification permission: ${res}`);
+                  } else {
+                    alert("Notifications are not supported in this browser.");
+                  }
+                }}
+                className="w-full bg-zinc-800 hover:bg-zinc-700 text-xs font-bold py-2 px-3 rounded transition-colors"
+              >
+                Enable Notifications
+              </button>
             </div>
           </PopoverContent>
         </Popover>

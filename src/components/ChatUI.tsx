@@ -65,13 +65,49 @@ export default function ChatUI({ room }: { room: string }) {
   // Reference to MediaRecorder instance for audio capture
   const recorderRef = useRef<MediaRecorder | null>(null);
 
+  // Request Notification permission when user enters chat room
+  useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission === "default") {
+        Notification.requestPermission().catch(() => {});
+      }
+    }
+  }, []);
+
   // Realtime Firestore Listener: subscribes to messages for active room ordered by creation time
   useEffect(() => {
     const q = query(
       collection(db, "rooms", room, "messages"),
       orderBy("createdAt"),
     );
+    let initialLoad = true;
     return onSnapshot(q, (snapshot) => {
+      if (initialLoad) {
+        initialLoad = false;
+      } else {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added") {
+            const data = change.doc.data() as Message;
+            // Notify if message was sent by someone else and page/tab is hidden or not focused
+            if (
+              data.userId !== auth.currentUser?.uid &&
+              typeof window !== "undefined" &&
+              "Notification" in window &&
+              Notification.permission === "granted" &&
+              document.hidden
+            ) {
+              const body = data.encrypted
+                ? "🔒 Encrypted Message"
+                : data.text || (data.mediaType ? `[${data.mediaType.toUpperCase()}]` : "New Message");
+              new Notification(`New message from ${data.displayName || "User"}`, {
+                body,
+                icon: data.photoURL || "/icon-192x192.png",
+              });
+            }
+          }
+        });
+      }
+
       setMessages(
         snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Message),
       );
@@ -133,30 +169,40 @@ export default function ChatUI({ room }: { room: string }) {
 
   // Initiates microphone access and starts recording audio using MediaRecorder API.
   const startRecord = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const rec = new MediaRecorder(stream);
-    const chunks: BlobPart[] = [];
-    rec.ondataavailable = (e) => chunks.push(e.data);
-    rec.onstop = () => {
-      const blob = new Blob(chunks, { type: "audio/webm" });
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onload = () =>
-        setPreview({
-          data: reader.result as string,
-          type: "audio",
-          name: "voice_note.webm",
-        });
-      stream.getTracks().forEach((t) => t.stop());
-    };
-    rec.start();
-    recorderRef.current = rec;
-    setIsRecording(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const rec = new MediaRecorder(stream);
+      const chunks: BlobPart[] = [];
+      rec.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+      rec.onstop = () => {
+        const mimeType = rec.mimeType || "audio/webm";
+        const blob = new Blob(chunks, { type: mimeType });
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onload = () =>
+          setPreview({
+            data: reader.result as string,
+            type: "audio",
+            name: "voice_note.webm",
+          });
+        stream.getTracks().forEach((t) => t.stop());
+      };
+      rec.start();
+      recorderRef.current = rec;
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Microphone access error:", err);
+      alert("Could not access microphone. Please check your browser permissions.");
+    }
   };
 
   // Stops active audio recording and triggers generation of audio preview blob.
   const stopRecord = () => {
-    recorderRef.current?.stop();
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop();
+    }
     setIsRecording(false);
   };
 

@@ -33,8 +33,9 @@ export default function MediaPreview({
             className="rounded-xl mb-4 max-h-64 w-full object-cover shadow-2xl"
           />
         ) : preview.type === "audio" ? (
-          <div className="p-8 bg-black rounded-xl mb-4 flex justify-center">
-            <Play size={40} style={{ color: theme.text2 }} />
+          <div className="p-4 bg-black rounded-xl mb-4 flex flex-col items-center gap-3">
+            <Play size={32} style={{ color: theme.text2 }} />
+            <audio src={preview.data} controls className="w-full h-10" />
           </div>
         ) : (
           <div className="p-8 bg-black rounded-xl mb-4 text-center">
