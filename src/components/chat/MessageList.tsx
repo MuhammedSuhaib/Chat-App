@@ -8,10 +8,17 @@ import { Message, RoomChatProps } from "./types";
 // Props for MessageList extending common RoomChatProps
 interface Props extends RoomChatProps {
   messages: Message[]; // Array of chat messages for the current room
+  cryptoKey: CryptoKey | null; // Active room decryption key, if encryption is unlocked
   onEdit: (id: string, text: string) => void;
 }
 
-export default function MessageList({ messages, room, theme, onEdit }: Props) {
+export default function MessageList({
+  messages,
+  room,
+  theme,
+  cryptoKey,
+  onEdit,
+}: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Automatically scrolls to the bottom whenever a new message is received or added.
@@ -28,6 +35,7 @@ export default function MessageList({ messages, room, theme, onEdit }: Props) {
           msg={msg}
           room={room}
           theme={theme}
+          cryptoKey={cryptoKey}
           onEdit={onEdit}
         />
       ))}

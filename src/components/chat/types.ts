@@ -9,6 +9,7 @@ export interface Message {
   mediaType?: "image" | "audio" | "pdf" | "gif";
   mediaData?: string;
   fileName?: string;
+  encrypted?: boolean;
 }
 
 // Defines custom visual theme settings for the chat room interface.

@@ -1,7 +1,8 @@
 //? MessageBubble Component: renders individual message bubbles with alignment and media handlers
 "use client";
 
-import { FileText, Trash2, Edit3, Play, Download } from "lucide-react";
+import { useEffect, useState } from "react";
+import { FileText, Trash2, Edit3, Play, Download, Lock } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -9,20 +10,66 @@ import {
 } from "@/components/ui/popover";
 import { doc, deleteDoc } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
+import { decryptText } from "@/lib/encryption";
 import { Message, RoomChatProps } from "./types";
 
 // Props for MessageBubble extending common RoomChatProps
 interface Props extends RoomChatProps {
   msg: Message; // The message object containing text, author details, timestamp, and optional media payload
+  cryptoKey: CryptoKey | null; // Active room decryption key, if encryption is unlocked
   onEdit: (id: string, text: string) => void;
 }
 
-export default function MessageBubble({ msg, room, theme, onEdit }: Props) {
+export default function MessageBubble({
+  msg,
+  room,
+  theme,
+  cryptoKey,
+  onEdit,
+}: Props) {
   // Determine if current logged in user is the author of this message
   const isMine = auth.currentUser?.uid === msg.userId;
 
+  // Decrypted text state: starts as raw text, replaced once decryption resolves
+  const [displayText, setDisplayText] = useState<string | null>(
+    msg.encrypted ? null : msg.text,
+  );
+  const [decryptFailed, setDecryptFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!msg.encrypted) {
+      setDisplayText(msg.text);
+      setDecryptFailed(false);
+      return;
+    }
+    if (!cryptoKey) {
+      setDisplayText(null);
+      setDecryptFailed(false);
+      return;
+    }
+    decryptText(msg.text, cryptoKey)
+      .then((plain) => {
+        if (!cancelled) {
+          setDisplayText(plain);
+          setDecryptFailed(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setDisplayText(null);
+          setDecryptFailed(true);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [msg.text, msg.encrypted, cryptoKey]);
+
   return (
-    <div className={`flex ${isMine ? "justify-end" : "justify-start"} group w-full`}>
+    <div
+      className={`flex ${isMine ? "justify-end" : "justify-start"} group w-full`}
+    >
       {/* Constrained bubble width so it never stretches full container */}
       <div
         className={`flex flex-col max-w-[75%] sm:max-w-[65%] ${isMine ? "items-end" : "items-start"}`}
@@ -47,7 +94,7 @@ export default function MessageBubble({ msg, room, theme, onEdit }: Props) {
             {isMine && (
               <PopoverContent className="bg-zinc-950/90 w-fit p-1 backdrop-blur-md flex gap-2">
                 <button
-                  onClick={() => onEdit(msg.id, msg.text)}
+                  onClick={() => onEdit(msg.id, displayText ?? msg.text)}
                   className="flex items-center gap-2 w-full text-[11px] font-bold hover:bg-white/5 transition-colors"
                 >
                   <Edit3 size={18} style={{ color: theme.text2 }} />
@@ -118,13 +165,26 @@ export default function MessageBubble({ msg, room, theme, onEdit }: Props) {
             </div>
           )}
 
+          {/* Encrypted message, no key available yet / wrong passphrase */}
+          {msg.encrypted && displayText === null && (
+            <p
+              className="flex items-center gap-2 text-[12px] italic opacity-50"
+              style={{ color: theme.text1 }}
+            >
+              <Lock size={12} />
+              {decryptFailed
+                ? "Unable to decrypt (wrong passphrase)"
+                : "Encrypted message — unlock to view"}
+            </p>
+          )}
+
           {/* Text Content with URL Regex Parsing */}
-          {msg.text && (
+          {displayText && (
             <p
               className="text-[14px] whitespace-pre-wrap leading-relaxed break-words"
               style={{ color: theme.text1 }}
             >
-              {msg.text.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+              {displayText.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
                 part.match(/https?:\/\/[^\s]+/) ? (
                   <a
                     key={i}
