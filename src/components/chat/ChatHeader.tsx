@@ -1,17 +1,27 @@
+//? ChatHeader Component: top navigation header with room title and theme settings popover
+
 "use client";
 
 import { Settings, Loader2 } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { AppTheme } from "./types";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { RoomChatProps, AppTheme } from "./types";
 
-interface Props {
-  room: string;
-  theme: AppTheme;
+// Props for ChatHeader extending common RoomChatProps
+interface Props extends RoomChatProps {
   setTheme: (t: AppTheme) => void;
   isUploading: boolean;
 }
 
-export default function ChatHeader({ room, theme, setTheme, isUploading }: Props) {
+export default function ChatHeader({
+  room,
+  theme,
+  setTheme,
+  isUploading,
+}: Props) {
   return (
     <header className="p-4 border-b border-white/10 flex justify-between items-center bg-black/60 backdrop-blur-md z-20">
       <h1 className="text-2xl font-black italic">
@@ -19,18 +29,27 @@ export default function ChatHeader({ room, theme, setTheme, isUploading }: Props
       </h1>
 
       <div className="flex items-center gap-4">
+        {/* Upload status indicator shown when message or media submission is in progress */}
         {isUploading && (
-          <div className="flex items-center gap-2 text-[10px] font-bold animate-pulse" style={{ color: theme.text2 }}>
+          <div
+            className="flex items-center gap-2 text-[10px] font-bold animate-pulse"
+            style={{ color: theme.text2 }}
+          >
             <Loader2 size={14} className="animate-spin" /> UPLOADING...
           </div>
         )}
+
+        {/* Theme Settings Popover */}
         <Popover>
           <PopoverTrigger title="Theme Settings" aria-label="Theme Settings">
             <Settings className="text-zinc-500 hover:text-white transition-colors cursor-pointer" />
           </PopoverTrigger>
           <PopoverContent className="bg-zinc-900 border-zinc-800 p-4 w-64 space-y-4 shadow-2xl">
+            {/* Color picker for accent/highlight color */}
             <div>
-              <label className="text-[10px] uppercase font-bold text-zinc-500">Highlight Color</label>
+              <label className="text-[10px] uppercase font-bold text-zinc-500">
+                Highlight Color
+              </label>
               <input
                 type="color"
                 className="w-full h-8 bg-transparent"
@@ -40,8 +59,12 @@ export default function ChatHeader({ room, theme, setTheme, isUploading }: Props
                 aria-label="Highlight Color"
               />
             </div>
+
+            {/* Input field for custom wallpaper URL */}
             <div>
-              <label className="text-[10px] uppercase font-bold text-zinc-500">Background Image URL</label>
+              <label className="text-[10px] uppercase font-bold text-zinc-500">
+                Background Image URL
+              </label>
               <input
                 type="text"
                 className="w-full bg-black border border-zinc-700 p-2 text-xs mt-1 rounded"

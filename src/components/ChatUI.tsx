@@ -1,3 +1,4 @@
+//? ChatUI Component: main orchestrator component for real-time chat interface
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -13,15 +14,20 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-import ChatHeader from "./chat/ChatHeader";
-import MessageList from "./chat/MessageList";
-import MediaPreview from "./chat/MediaPreview";
-import ChatInput from "./chat/ChatInput";
-import { Message, AppTheme, Preview } from "./chat/types";
+import {
+  ChatHeader,
+  MessageList,
+  MediaPreview,
+  ChatInput,
+  Message,
+  AppTheme,
+  Preview,
+} from "./chat";
 
 export default function ChatUI({ room }: { room: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  // State holding ID of message currently being edited (null if creating new message)
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -32,14 +38,24 @@ export default function ChatUI({ room }: { room: string }) {
     bgImage: "",
   });
 
+  // Reference to MediaRecorder instance for audio capture
   const recorderRef = useRef<MediaRecorder | null>(null);
 
+  // Realtime Firestore Listener: subscribes to messages for active room ordered by creation time
   useEffect(() => {
-    const q = query(collection(db, "rooms", room, "messages"), orderBy("createdAt"));
+    const q = query(
+      collection(db, "rooms", room, "messages"),
+      orderBy("createdAt"),
+    );
     return onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Message)));
+      setMessages(
+        snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Message),
+      );
     });
   }, [room]);
+
+  // Handles for sending or updating an existing message in Firestore.
+  // Also processes attached media (images, GIFs, PDFs, audio voice notes).
 
   const handleAction = async (media?: Preview | null) => {
     if ((!input.trim() && !media) || !auth.currentUser) return;
@@ -47,9 +63,13 @@ export default function ChatUI({ room }: { room: string }) {
 
     try {
       if (editingId) {
-        await updateDoc(doc(db, "rooms", room, "messages", editingId), { text: input });
+        // Update existing message text
+        await updateDoc(doc(db, "rooms", room, "messages", editingId), {
+          text: input,
+        });
         setEditingId(null);
       } else {
+        // Create new message document in Firestore
         await addDoc(collection(db, "rooms", room, "messages"), {
           text: input,
           userId: auth.currentUser.uid,
@@ -64,12 +84,13 @@ export default function ChatUI({ room }: { room: string }) {
       setInput("");
       setPreview(null);
     } catch (e) {
-      console.error(e);
+      console.error("Error saving message:", e);
     } finally {
       setIsUploading(false);
     }
   };
 
+  // Reads a user-selected File object and converts it into a Base64 data URL preview.
   const prepareMedia = (file: File) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -81,6 +102,7 @@ export default function ChatUI({ room }: { room: string }) {
     };
   };
 
+  // Initiates microphone access and starts recording audio using MediaRecorder API.
   const startRecord = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const rec = new MediaRecorder(stream);
@@ -91,7 +113,11 @@ export default function ChatUI({ room }: { room: string }) {
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onload = () =>
-        setPreview({ data: reader.result as string, type: "audio", name: "voice_note.webm" });
+        setPreview({
+          data: reader.result as string,
+          type: "audio",
+          name: "voice_note.webm",
+        });
       stream.getTracks().forEach((t) => t.stop());
     };
     rec.start();
@@ -99,6 +125,7 @@ export default function ChatUI({ room }: { room: string }) {
     setIsRecording(true);
   };
 
+  // Stops active audio recording and triggers generation of audio preview blob.
   const stopRecord = () => {
     recorderRef.current?.stop();
     setIsRecording(false);
@@ -113,8 +140,15 @@ export default function ChatUI({ room }: { room: string }) {
         backgroundPosition: "center",
       }}
     >
-      <ChatHeader room={room} theme={theme} setTheme={setTheme} isUploading={isUploading} />
+      {/* Top Header bar with room name and theme customization */}
+      <ChatHeader
+        room={room}
+        theme={theme}
+        setTheme={setTheme}
+        isUploading={isUploading}
+      />
 
+      {/* Main scrollable list of messages */}
       <MessageList
         messages={messages}
         room={room}
@@ -125,6 +159,7 @@ export default function ChatUI({ room }: { room: string }) {
         }}
       />
 
+      {/* Media attachment modal preview overlay */}
       {preview && (
         <MediaPreview
           preview={preview}
@@ -134,6 +169,7 @@ export default function ChatUI({ room }: { room: string }) {
         />
       )}
 
+      {/* Bottom text input & voice recording controls */}
       <ChatInput
         input={input}
         setInput={setInput}

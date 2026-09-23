@@ -1,28 +1,38 @@
+//? MessageList Component: displays scrollable list of messages and handles auto-scroll
 "use client";
 
 import { useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble";
-import { Message, AppTheme } from "./types";
+import { Message, RoomChatProps } from "./types";
 
-interface Props {
-  messages: Message[];
-  room: string;
-  theme: AppTheme;
+// Props for MessageList extending common RoomChatProps
+
+interface Props extends RoomChatProps {
+  messages: Message[]; // Array of chat messages for the current room
   onEdit: (id: string, text: string) => void;
 }
 
 export default function MessageList({ messages, room, theme, onEdit }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  //  Automatically scrolls to the bottom whenever a new message is received or added.
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
     <main className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar bg-black/20">
+      {/* Map each message in the room to a MessageBubble component */}
       {messages.map((msg) => (
-        <MessageBubble key={msg.id} msg={msg} room={room} theme={theme} onEdit={onEdit} />
+        <MessageBubble
+          key={msg.id}
+          msg={msg}
+          room={room}
+          theme={theme}
+          onEdit={onEdit}
+        />
       ))}
+      {/* Anchor element used for auto-scrolling to latest message */}
       <div ref={scrollRef} />
     </main>
   );

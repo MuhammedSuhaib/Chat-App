@@ -1,20 +1,30 @@
+//? MediaPreview Component: modal preview layer for pending media attachments before sending
 "use client";
 
 import { Play, FileText } from "lucide-react";
-import { Preview, AppTheme } from "./types";
+import { Preview, BaseChatProps } from "./types";
 
-interface Props {
+// Props for MediaPreview extending common BaseChatProps
+interface Props extends BaseChatProps {
   preview: Preview;
-  theme: AppTheme;
   onCancel: () => void;
   onSend: () => void;
 }
 
-export default function MediaPreview({ preview, theme, onCancel, onSend }: Props) {
+export default function MediaPreview({
+  preview,
+  theme,
+  onCancel,
+  onSend,
+}: Props) {
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6">
       <div className="bg-zinc-900 border border-white/10 rounded-3xl p-6 max-w-sm w-full shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 text-zinc-500">Encrypted Preview</h2>
+        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 text-zinc-500">
+          Encrypted Preview
+        </h2>
+
+        {/* Render preview based on media type */}
         {preview.type === "image" || preview.type === "gif" ? (
           <img
             src={preview.data}
@@ -33,6 +43,7 @@ export default function MediaPreview({ preview, theme, onCancel, onSend }: Props
           </div>
         )}
 
+        {/* Action Buttons: Cancel or Send Now */}
         <div className="flex gap-2">
           <button
             onClick={onCancel}
