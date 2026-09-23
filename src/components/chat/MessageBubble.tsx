@@ -12,6 +12,7 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import { decryptText } from "@/lib/encryption";
 import { Message, RoomChatProps } from "./types";
+import Image from "next/image";
 
 // Props for MessageBubble extending common RoomChatProps
 interface Props extends RoomChatProps {
@@ -81,9 +82,12 @@ export default function MessageBubble({
           {/* Avatar menu trigger (allows Edit/Delete for user's own messages) */}
           <Popover>
             <PopoverTrigger asChild>
-              <img
-                src={msg.photoURL}
+              <Image
+                src={msg.photoURL || "/user.jpg"}
                 alt="avatar"
+                width={32}
+                height={32}
+                unoptimized
                 className="size-8 rounded-full border border-white/10 cursor-pointer active:scale-90 transition-transform shrink-0"
                 style={{
                   boxShadow: isMine ? `0 0 10px ${theme.text2}44` : "none",
@@ -127,16 +131,22 @@ export default function MessageBubble({
         >
           {/* Media Renderers */}
           {msg.mediaType === "image" && (
-            <img
-              src={msg.mediaData}
-              className="rounded-lg mb-2 max-h-64 max-w-full shadow-lg border border-white/5"
+            <Image
+              src={msg.mediaData || ""}
+              width={400}
+              height={256}
+              unoptimized
+              className="rounded-lg mb-2 max-h-64 max-w-full shadow-lg border border-white/5 object-cover"
               alt="Shared"
             />
           )}
           {msg.mediaType === "gif" && (
-            <img
-              src={msg.mediaData}
-              className="rounded-lg mb-2 max-h-64 max-w-full"
+            <Image
+              src={msg.mediaData || ""}
+              width={400}
+              height={256}
+              unoptimized
+              className="rounded-lg mb-2 max-h-64 max-w-full object-cover"
               alt="GIF"
             />
           )}

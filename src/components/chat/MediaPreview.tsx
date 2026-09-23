@@ -11,6 +11,8 @@ interface Props extends BaseChatProps {
   onSend: () => void;
 }
 
+import Image from "next/image";
+
 export default function MediaPreview({
   preview,
   theme,
@@ -26,10 +28,13 @@ export default function MediaPreview({
 
         {/* Render preview based on media type */}
         {preview.type === "image" || preview.type === "gif" ? (
-          <img
+          <Image
             src={preview.data}
             alt="Preview"
             title="Media preview"
+            width={400}
+            height={256}
+            unoptimized
             className="rounded-xl mb-4 max-h-64 w-full object-cover shadow-2xl"
           />
         ) : preview.type === "audio" ? (

@@ -14,6 +14,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+import Image from "next/image";
+
 const cookies = new Cookies();
 
 export function UserMenu() {
@@ -37,9 +39,11 @@ export function UserMenu() {
     <div className="flex items-center justify-end p-4">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <img
+          <Image
             src={user.photoURL || "/user.jpg"}
             alt="avatar"
+            width={32}
+            height={32}
             className="w-8 h-8 rounded-full cursor-pointer"
           />
         </DropdownMenuTrigger>
