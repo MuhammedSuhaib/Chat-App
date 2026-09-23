@@ -1,3 +1,4 @@
+//? THIS is for creating rooms
 import { db } from "@/lib/firebase";
 import {
   addDoc,

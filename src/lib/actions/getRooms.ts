@@ -1,3 +1,4 @@
+//? THIS is for getting rooms
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
