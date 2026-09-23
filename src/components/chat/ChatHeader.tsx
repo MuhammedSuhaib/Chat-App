@@ -1,4 +1,4 @@
-//? ChatHeader: room title + theme settings + on-demand encryption toggle
+//? ChatHeader Component: top navigation header with room title, encryption toggle and theme settings popover
 "use client";
 
 import { Settings, Loader2, Lock, Unlock } from "lucide-react";
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/popover";
 import { RoomChatProps, AppTheme } from "./types";
 
+// Props for ChatHeader extending common RoomChatProps
 interface Props extends RoomChatProps {
   setTheme: (t: AppTheme) => void;
   isUploading: boolean;
@@ -31,7 +32,7 @@ export default function ChatHeader({
       </h1>
 
       <div className="flex items-center gap-3">
-        {/* Upload status indicator */}
+        {/* Upload status indicator shown when message or media submission is in progress */}
         {isUploading && (
           <div
             className="flex items-center gap-2 text-[10px] font-bold animate-pulse"
@@ -49,7 +50,9 @@ export default function ChatHeader({
           className="p-1.5 rounded-full transition-colors"
           style={{
             color: encryptionEnabled ? theme.text2 : "#71717a",
-            backgroundColor: encryptionEnabled ? `${theme.text2}22` : "transparent",
+            backgroundColor: encryptionEnabled
+              ? `${theme.text2}22`
+              : "transparent",
           }}
         >
           {encryptionEnabled ? <Lock size={18} /> : <Unlock size={18} />}
@@ -61,6 +64,7 @@ export default function ChatHeader({
             <Settings className="text-zinc-500 hover:text-white transition-colors cursor-pointer" />
           </PopoverTrigger>
           <PopoverContent className="bg-zinc-900 border-zinc-800 p-4 w-64 space-y-4 shadow-2xl">
+            {/* Color picker for accent/highlight color */}
             <div>
               <label className="text-[10px] uppercase font-bold text-zinc-500">
                 Highlight Color
@@ -75,6 +79,7 @@ export default function ChatHeader({
               />
             </div>
 
+            {/* Input field for custom wallpaper URL */}
             <div>
               <label className="text-[10px] uppercase font-bold text-zinc-500">
                 Background Image URL
