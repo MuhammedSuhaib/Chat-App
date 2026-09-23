@@ -1,52 +1,95 @@
- list of what I've done so far:
+# Firebase Chat App (PWA)
 
-1. Initialized Firebase
+A real-time, privacy-focused chat application built with Next.js 15, Firebase, and TypeScript. Features Google authentication, end-to-end encryption on demand, audio voice notes, rich media previews, native browser notifications, customizable wallpapers, and Progressive Web App (PWA) offline support.
 
-Linked with your project
+## 🚀 Key Features
 
-Added Firestore, hosting, and index config
+- 🔐 **Google Authentication** - Secure sign-in with Firebase Auth.
+- 🔒 **On-Demand End-to-End Encryption** - AES-GCM 256-bit client-side encryption using PBKDF2 passphrase key derivation.
+- 💬 **Real-time Messaging** - Instant live chat powered by Firebase Firestore.
+- 🎙️ **Voice Notes** - Record, preview, and play audio voice notes directly inside the chat interface.
+- 📸 **Media & File Attachments** - Share images, GIFs, and PDF documents.
+- 🔔 **Native Push Notifications** - Background browser notifications when new messages arrive.
+- 🎨 **Theme & Local Wallpapers** - Custom accent colors and upload custom local image wallpapers or URLs.
+- 📱 **PWA & Mobile Responsive** - Installable Progressive Web App with offline caching support (`@ducanh2912/next-pwa`).
 
-2. Set up Next.js app with:
+## 🛠️ Tech Stack
 
-TypeScript
+- **Framework:** Next.js 15.3.2 with App Router
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS v4
+- **UI Primitives:** Radix UI (`Popover`, `DropdownMenu`, etc.)
+- **Icons:** Lucide React
+- **Authentication & Database:** Firebase Auth & Firestore
+- **Security:** Web Crypto API (`SubtleCrypto` for AES-GCM encryption)
+- **PWA Integration:** `@ducanh2912/next-pwa`
 
-Tailwind CSS
+## 📁 Project Structure
 
-App directory
+```
+src/
+├── app/               # Next.js App Router pages
+│   ├── rooms/         # Dynamic chat room routes (`/rooms/[room]`)
+│   ├── layout.tsx     # Root layout with PWA manifest & theme providers
+│   └── page.tsx       # Home page & room creation
+├── components/        # React components
+│   ├── chat/          # Modular chat components & barrel exports
+│   │   ├── ChatHeader.tsx    # Header with encryption toggle & settings
+│   │   ├── ChatInput.tsx     # Message input, media attachment & mic recorder
+│   │   ├── MediaPreview.tsx  # Modal preview for images, audio & PDFs
+│   │   ├── MessageBubble.tsx # Message bubble with decryption & media rendering
+│   │   ├── MessageList.tsx   # Auto-scrolling message list container
+│   │   ├── index.ts          # Module export aggregator
+│   │   └── types.ts          # TypeScript types & interfaces
+│   ├── ui/            # Reusable UI components (button, popover, etc.)
+│   ├── Auth.tsx       # Google authentication component
+│   ├── AuthWrapper.tsx# Client-side Auth protection wrapper
+│   ├── ChatUI.tsx     # Chat orchestrator component
+│   └── Theme-provider.tsx
+└── lib/               # Utilities & helpers
+    ├── encryption.ts  # Web Crypto API AES-GCM encryption/decryption helpers
+    ├── firebase.ts    # Firebase app initialization & config
+    └── utils.ts       # Utility helper functions
+```
 
-3. Installed & configured next-themes
+## 💻 Getting Started
 
-Wrapped app in ThemeProvider
+### Prerequisites
 
-Enabled system/light/dark mode
+- Node.js 18+ installed
+- Firebase Project set up with Auth and Firestore enabled
 
-4. Set up custom design tokens using shadcn-style CSS variables
+### Installation
 
-Defined --background, --foreground, etc. for both light & dark
+1. Clone this repository
+2. Install dependencies:
 
-Used @layer base to apply them via Tailwind
+   ```bash
+   pnpm install
+   ```
 
-5. Customized dark mode
+3. Configure environment variables in `.env.local`:
 
-Tweaked background to #121212
+   ```env
+   NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+   ```
 
-Verified dark mode text visibility
+4. Run the development server:
 
-6. Understood design tokens like card, popover for UI layering
-✅ Switched from Clerk to Firebase Auth
+   ```bash
+   pnpm dev
+   ```
 
-✅ Set up Firebase project, Firestore DB, and Auth
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-✅ Created Google Sign-In using Firebase (signInWithPopup)
+## 📜 Available Scripts
 
-✅ Stored auth-token in cookies and used it to persist auth state
-
-✅ Built a custom Auth component
-
-✅ Built a SignOutBtn with cookie clearing
-
-✅ Protected app routes using isAuth state
-
-✅ Built UI for entering a chat room name
-
-✅ Toggled between room input and ChatUI view with isInChat
+- `pnpm dev` - Start Next.js development server
+- `pnpm build` - Build production bundle & PWA service worker
+- `pnpm start` - Start production server
+- `pnpm lint` - Run ESLint code checks

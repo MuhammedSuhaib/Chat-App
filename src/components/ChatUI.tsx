@@ -1,234 +1,265 @@
+//? ChatUI Component: main orchestrator component for real-time chat interface
 "use client";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { useEffect, useRef, useState } from "react";
+
+import React, { useEffect, useRef, useState } from "react";
 import { db, auth } from "@/lib/firebase";
 import {
-    addDoc,
-    collection,
-    onSnapshot,
-    orderBy,
-    query,
-    serverTimestamp,
-    doc,
-    deleteDoc,
-    updateDoc,
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
-import Image from "next/image";
 
-// ChatUI component for displaying and managing chat messages in a room
+import {
+  ChatHeader,
+  MessageList,
+  MediaPreview,
+  ChatInput,
+  Message,
+  AppTheme,
+  Preview,
+} from "./chat";
+import { deriveKey, encryptText } from "@/lib/encryption";
+
 export default function ChatUI({ room }: { room: string }) {
-    const [input, setInput] = useState("");
-    const [messages, setMessages] = useState<
-        {
-            id: string;
-            text: string;
-            displayName: string;
-            photoURL: string;
-            createdAt: Date | null;
-            userId?: string;
-        }[]
-    >([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  // State holding ID of message currently being edited (null if creating new message)
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [preview, setPreview] = useState<Preview | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [encryptionEnabled, setEncryptionEnabled] = useState(false);
+  const [cryptoKey, setCryptoKey] = useState<CryptoKey | null>(null);
 
-    // Ref for scrolling to the latest message
-    const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
-    // Reference to the Firestore messages subcollection for the current room
-    const messagesRef = collection(db, "rooms", room, "messages");
-    // State for editing message
-    const [editingId, setEditingId] = useState<string | null>(null);
-    const [editingText, setEditingText] = useState("");
-
-    // Delete a message by id
-    const deleteMessage = async (id: string) => {
-        await deleteDoc(doc(db, "rooms", room, "messages", id));
-    };
-
-    // Start editing a message
-    const startEditing = (id: string, currentText: string) => {
-        setEditingId(id);
-        setEditingText(currentText);
-    };
-
-    // Save the edited message
-    const saveEdit = async () => {
-        if (!editingId || !editingText.trim()) return;
-        await updateDoc(doc(db, "rooms", room, "messages", editingId), { text: editingText });
-        setEditingId(null);
-        setEditingText("");
-    };
-
-    // Cancel editing
-    const cancelEdit = () => {
-        setEditingId(null);
-        setEditingText("");
-    };
-
-    // Listen for new messages in the current room
-    useEffect(() => {
-        const q = query(
-            messagesRef,
-            orderBy("createdAt")
+  // Toggle encryption: ask for a room passphrase, derive a key, remember it for this browser
+  const handleToggleEncryption = async (next: boolean) => {
+    if (next) {
+      const storageKey = `chat-passphrase:${room}`;
+      let passphrase = localStorage.getItem(storageKey) || "";
+      if (!passphrase) {
+        const entered = window.prompt(
+          "Set/enter a shared encryption passphrase for this room:",
         );
+        if (!entered) return; // user cancelled, keep encryption off
+        passphrase = entered;
+        localStorage.setItem(storageKey, passphrase);
+      }
+      const key = await deriveKey(passphrase, room);
+      setCryptoKey(key);
+      setEncryptionEnabled(true);
+    } else {
+      setEncryptionEnabled(false);
+    }
+  };
+  const [theme, setTheme] = useState<AppTheme>({
+    text1: "#ffffff",
+    text2: "#20e07d",
+    bgImage: "",
+  });
 
-        const unsub = onSnapshot(q, (snapshot) => {
-            const msgs = snapshot.docs.map((doc) => {
-                const data = doc.data();
-                return {
-                    id: doc.id,
-                    text: data.text,
-                    displayName: data.displayName || "Unknown",
-                    photoURL: data.photoURL || "",
-                    createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : null,
-                    userId: data.userId,
-                };
-            });
-            setMessages(msgs);
-        });
+  // Reference to MediaRecorder instance for audio capture
+  const recorderRef = useRef<MediaRecorder | null>(null);
 
-        return () => unsub();
-    }, [room]);
+  // Request Notification permission when user enters chat room
+  useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      if (Notification.permission === "default") {
+        Notification.requestPermission().catch(() => {});
+      }
+    }
+  }, []);
 
-    // Scroll to the latest message when messages change
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
-
-    // Handle sending a new message
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!input.trim() || !auth.currentUser) return;
-
-        await addDoc(messagesRef, {
-            text: input,
-            room,
-            createdAt: serverTimestamp(),
-            userId: auth.currentUser.uid,
-            displayName: auth.currentUser.displayName,
-            photoURL: auth.currentUser.photoURL,
-        });
-
-        setInput("");
-    };
-
-    return (
-        <div className="p-6 max-w-xl mx-auto bg-white dark:bg-neutral-900 rounded-lg shadow-lg dark:shadow-white/20">
-            {/* Room title */}
-            <div className="text-2xl font-extrabold mb-6 text-gray-900 dark:text-white border-b border-gray-300 dark:border-gray-700 pb-3">
-                Room: <span className="text-[#20e07d]">{room}</span>
-            </div>
-
-            {/* Messages list */}
-            <div className="space-y-4 p-4 h-96 overflow-y-auto rounded-lg shadow-inner bg-gray-50 dark:bg-amber-600">
-                {messages.map((msg) => {
-                    const isMine = auth.currentUser && msg.userId === auth.currentUser.uid;
-                    const isEditing = editingId === msg.id;
-                    return (
-                        <div
-                            key={msg.id}
-                            className={`flex items-end space-x-2 text-gray-900 dark:text-gray-100 ${isMine ? "justify-end" : "justify-start"}`}
-                        >
-                            {!isMine && msg.photoURL && (
-                                <img
-                                    src={msg.photoURL}
-                                    alt="avatar"
-                                    className="size-6 rounded-full border-2 border-[#20e07d]"
-                                />
-                            )}
-                            <div className={`relative max-w-[80%] sm:max-w-[70%] ${isMine ? "bg-[#20e07d]/20" : "bg-gray-200 dark:bg-neutral-700"} p-3 rounded-xl shadow-sm`}>
-                                <div className="flex justify-center gap-3 items-center mb-1">
-                                    <span className="font-semibold text-sm">{msg.displayName}</span>
-                                    {isMine && !isEditing && (
-                                        <Popover>
-                                            <PopoverTrigger>
-                                                {isMine && msg.photoURL && (
-                                                    <img
-                                                        src={msg.photoURL}
-                                                        alt="avatar"
-                                                        className="size-6 rounded-full border-2 border-[#20e07d]"
-                                                    />
-                                                )}
-                                            </PopoverTrigger>
-                                            <PopoverContent className="size-fit">
-                                                <button
-                                                    onClick={() => startEditing(msg.id, msg.text)}
-                                                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-neutral-700"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => deleteMessage(msg.id)}
-                                                    className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-neutral-700"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </PopoverContent>
-                                        </Popover>
-                                    )}
-                                </div>
-
-                                {isEditing ? (
-                                    <>
-                                        <input
-                                            className="w-full p-2 mt-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#20e07d]"
-                                            value={editingText}
-                                            placeholder="Edit your message..."
-                                            onChange={(e) => setEditingText(e.target.value)}
-                                        />
-                                        <div className="flex space-x-3 mt-2 justify-end text-sm">
-                                            <button onClick={saveEdit} className="text-green-600 hover:underline font-semibold">
-                                                Save
-                                            </button>
-                                            <button onClick={cancelEdit} className="text-gray-400 hover:underline font-semibold">
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className="whitespace-pre-wrap break-words text-sm">{msg.text}</p>
-                                        <span className="block mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                            {msg.createdAt?.toLocaleTimeString()}
-                                        </span>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
-                <div ref={messagesEndRef} />
-            </div>
-            {/* Message input form */}
-            <form onSubmit={handleSubmit} className="flex mt-6 gap-3">
-                {/* type msg*/}
-                <input
-                    type="text"
-                    disabled={!!editingId}
-                    placeholder="      Type your message..."
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    className="flex-grow size-xs rounded-4xl border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#20e07d] "
-                />
-                {/* send button ⇗ */}
-                <button
-                    type="submit"
-                    disabled={!!editingId}
-                    aria-label="Send"
-                    title="Send"
-                >
-                    <Image
-                        src="/send.png"
-                        width={512}
-                        height={512}
-                        alt="send"
-                        className="size-7 pointer-events-none"
-                    />
-                </button>
-            </form>
-        </div>
-
+  // Realtime Firestore Listener: subscribes to messages for active room ordered by creation time
+  useEffect(() => {
+    const q = query(
+      collection(db, "rooms", room, "messages"),
+      orderBy("createdAt"),
     );
+    let initialLoad = true;
+    return onSnapshot(q, (snapshot) => {
+      if (initialLoad) {
+        initialLoad = false;
+      } else {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added") {
+            const data = change.doc.data() as Message;
+            // Notify if message was sent by someone else and page/tab is hidden or not focused
+            if (
+              data.userId !== auth.currentUser?.uid &&
+              typeof window !== "undefined" &&
+              "Notification" in window &&
+              Notification.permission === "granted" &&
+              document.hidden
+            ) {
+              const body = data.encrypted
+                ? "🔒 Encrypted Message"
+                : data.text || (data.mediaType ? `[${data.mediaType.toUpperCase()}]` : "New Message");
+              new Notification(`New message from ${data.displayName || "User"}`, {
+                body,
+                icon: data.photoURL || "/icon-192x192.png",
+              });
+            }
+          }
+        });
+      }
+
+      setMessages(
+        snapshot.docs.map((d) => ({ id: d.id, ...d.data() }) as Message),
+      );
+    });
+  }, [room]);
+
+  // Handles for sending or updating an existing message in Firestore.
+  // Also processes attached media (images, GIFs, PDFs, audio voice notes).
+  const handleAction = async (media?: Preview | null) => {
+    if ((!input.trim() && !media) || !auth.currentUser) return;
+    setIsUploading(true);
+
+    try {
+      const shouldEncrypt = encryptionEnabled && !!cryptoKey && !!input.trim();
+      const outgoingText =
+        shouldEncrypt && cryptoKey ? await encryptText(input, cryptoKey) : input;
+
+      if (editingId) {
+        // Update existing message text
+        await updateDoc(doc(db, "rooms", room, "messages", editingId), {
+          text: outgoingText,
+          encrypted: shouldEncrypt,
+        });
+        setEditingId(null);
+      } else {
+        // Create new message document in Firestore
+        await addDoc(collection(db, "rooms", room, "messages"), {
+          text: outgoingText,
+          userId: auth.currentUser.uid,
+          displayName: auth.currentUser.displayName || "User",
+          photoURL: auth.currentUser.photoURL || "",
+          createdAt: serverTimestamp(),
+          mediaType: media?.type || null,
+          mediaData: media?.data || null,
+          fileName: media?.name || null,
+          encrypted: shouldEncrypt,
+        });
+      }
+      setInput("");
+      setPreview(null);
+    } catch (e) {
+      console.error("Error saving message:", e);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Reads a user-selected File object and converts it into a Base64 data URL preview.
+  const prepareMedia = (file: File) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      let type = "image";
+      if (file.type === "image/gif") type = "gif";
+      if (file.type === "application/pdf") type = "pdf";
+      setPreview({ data: reader.result as string, type, name: file.name });
+    };
+  };
+
+  // Initiates microphone access and starts recording audio using MediaRecorder API.
+  const startRecord = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const rec = new MediaRecorder(stream);
+      const chunks: BlobPart[] = [];
+      rec.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+      rec.onstop = () => {
+        const mimeType = rec.mimeType || "audio/webm";
+        const blob = new Blob(chunks, { type: mimeType });
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onload = () =>
+          setPreview({
+            data: reader.result as string,
+            type: "audio",
+            name: "voice_note.webm",
+          });
+        stream.getTracks().forEach((t) => t.stop());
+      };
+      rec.start();
+      recorderRef.current = rec;
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Microphone access error:", err);
+      alert("Could not access microphone. Please check your browser permissions.");
+    }
+  };
+
+  // Stops active audio recording and triggers generation of audio preview blob.
+  const stopRecord = () => {
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop();
+    }
+    setIsRecording(false);
+  };
+
+  return (
+    <div
+      className="flex flex-col h-[100dvh] bg-black text-white overflow-hidden overflow-x-hidden relative"
+      style={{
+        backgroundImage: theme.bgImage ? `url(${theme.bgImage})` : "none",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* Top Header bar with room name and theme customization */}
+      <ChatHeader
+        room={room}
+        theme={theme}
+        setTheme={setTheme}
+        isUploading={isUploading}
+        encryptionEnabled={encryptionEnabled}
+        setEncryptionEnabled={handleToggleEncryption}
+      />
+
+      {/* Main scrollable list of messages */}
+      <MessageList
+        messages={messages}
+        room={room}
+        theme={theme}
+        cryptoKey={cryptoKey}
+        onEdit={(id, text) => {
+          setEditingId(id);
+          setInput(text);
+        }}
+      />
+
+      {/* Media attachment modal preview overlay */}
+      {preview && (
+        <MediaPreview
+          preview={preview}
+          theme={theme}
+          onCancel={() => setPreview(null)}
+          onSend={() => handleAction(preview)}
+        />
+      )}
+
+      {/* Bottom text input & voice recording controls */}
+      <ChatInput
+        input={input}
+        setInput={setInput}
+        editingId={editingId}
+        theme={theme}
+        isRecording={isRecording}
+        onSend={() => handleAction()}
+        onStartRecord={startRecord}
+        onStopRecord={stopRecord}
+        onPrepareMedia={prepareMedia}
+        setPreview={setPreview}
+      />
+    </div>
+  );
 }

@@ -1,3 +1,4 @@
+//? AuthWrapper: gates app behind Google auth using cookie token
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,14 +7,20 @@ import { Auth } from "./Auth";
 
 const cookies = new Cookies();
 
+// wrapper to show Auth screen if not authenticated
 export function AuthWrapper({ children }: { children: React.ReactNode }) {
-    const [isAuth, setIsAuth] = useState(false);
+  // state to track auth status
+  const [isAuth, setIsAuth] = useState(false);
 
-    useEffect(() => {
-        const token = cookies.get("auth-token");
-        if (token) setIsAuth(true);
-    }, []);
+  // check cookie once on mount
+  useEffect(() => {
+    const token = cookies.get("auth-token");
+    if (token) setIsAuth(true); // if token exists, set as authenticated
+  }, []);
 
-    if (!isAuth) return <Auth setIsAuth={setIsAuth} />;
-    return <>{children}</>;
+  // show Auth if not authenticated
+  if (!isAuth) return <Auth setIsAuth={setIsAuth} />;
+
+  // otherwise show children
+  return <>{children}</>;
 }
