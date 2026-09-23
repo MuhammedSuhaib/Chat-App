@@ -23,6 +23,7 @@ import {
   AppTheme,
   Preview,
 } from "./chat";
+import { deriveKey, encryptText } from "@/lib/encryption";
 
 export default function ChatUI({ room }: { room: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -33,6 +34,28 @@ export default function ChatUI({ room }: { room: string }) {
   const [preview, setPreview] = useState<Preview | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [encryptionEnabled, setEncryptionEnabled] = useState(false);
+  const [cryptoKey, setCryptoKey] = useState<CryptoKey | null>(null);
+
+  // Toggle encryption: ask for a room passphrase, derive a key, remember it for this browser
+  const handleToggleEncryption = async (next: boolean) => {
+    if (next) {
+      const storageKey = `chat-passphrase:${room}`;
+      let passphrase = localStorage.getItem(storageKey) || "";
+      if (!passphrase) {
+        const entered = window.prompt(
+          "Set/enter a shared encryption passphrase for this room:",
+        );
+        if (!entered) return; // user cancelled, keep encryption off
+        passphrase = entered;
+        localStorage.setItem(storageKey, passphrase);
+      }
+      const key = await deriveKey(passphrase, room);
+      setCryptoKey(key);
+      setEncryptionEnabled(true);
+    } else {
+      setEncryptionEnabled(false);
+    }
+  };
   const [theme, setTheme] = useState<AppTheme>({
     text1: "#ffffff",
     text2: "#20e07d",
@@ -62,16 +85,21 @@ export default function ChatUI({ room }: { room: string }) {
     setIsUploading(true);
 
     try {
+      const shouldEncrypt = encryptionEnabled && !!cryptoKey && !!input.trim();
+      const outgoingText =
+        shouldEncrypt && cryptoKey ? await encryptText(input, cryptoKey) : input;
+
       if (editingId) {
         // Update existing message text
         await updateDoc(doc(db, "rooms", room, "messages", editingId), {
-          text: input,
+          text: outgoingText,
+          encrypted: shouldEncrypt,
         });
         setEditingId(null);
       } else {
         // Create new message document in Firestore
         await addDoc(collection(db, "rooms", room, "messages"), {
-          text: input,
+          text: outgoingText,
           userId: auth.currentUser.uid,
           displayName: auth.currentUser.displayName || "User",
           photoURL: auth.currentUser.photoURL || "",
@@ -79,7 +107,7 @@ export default function ChatUI({ room }: { room: string }) {
           mediaType: media?.type || null,
           mediaData: media?.data || null,
           fileName: media?.name || null,
-          encrypted: encryptionEnabled,
+          encrypted: shouldEncrypt,
         });
       }
       setInput("");
@@ -148,7 +176,7 @@ export default function ChatUI({ room }: { room: string }) {
         setTheme={setTheme}
         isUploading={isUploading}
         encryptionEnabled={encryptionEnabled}
-        setEncryptionEnabled={setEncryptionEnabled}
+        setEncryptionEnabled={handleToggleEncryption}
       />
 
       {/* Main scrollable list of messages */}
@@ -156,6 +184,7 @@ export default function ChatUI({ room }: { room: string }) {
         messages={messages}
         room={room}
         theme={theme}
+        cryptoKey={cryptoKey}
         onEdit={(id, text) => {
           setEditingId(id);
           setInput(text);
