@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/Theme-provider"
+import { ThemeProvider } from "@/components/Theme-provider";
 import { AuthWrapper } from "@/components/AuthWrapper";
 import { UserMenu } from "@/components/AvatarDropdown";
-import Link from "next/link";
 import { APP_NAME } from "@/lib/constants";
-
+import Link from "next/link";
+import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -47,7 +47,9 @@ export default function RootLayout({
             <div className="flex justify-around items-center-safe">
               <Link href="/">
                 <span className="flex flex-wrap justify-center text-2xl font-bold tracking-wide text-center leading-tight">
-                  &lt;<span className="text-1xl text-purple-400">{APP_NAME}</span>/&gt;
+                  &lt;
+                  <span className="text-1xl text-purple-400">{APP_NAME}</span>
+                  /&gt;
                 </span>
               </Link>
               <UserMenu />

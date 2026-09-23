@@ -105,3 +105,11 @@ This app is configured for deployment on Replit. The project includes:
 3. Make your changes
 4. Test thoroughly
 5. Submit a pull request
+
+## whats next 
+
+- encryption on demand
+- peerjs
+- notifications
+- testable test each step after completation
+- clean documentation of everything and updated readme etc

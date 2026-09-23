@@ -45,20 +45,20 @@ export default function MessageBubble({ msg, room, theme, onEdit }: Props) {
               />
             </PopoverTrigger>
             {isMine && (
-              <PopoverContent className="bg-zinc-950/90 border-white/10 w-32 p-1 backdrop-blur-md">
+              <PopoverContent className="bg-zinc-950/90 w-fit p-1 backdrop-blur-md flex gap-2">
                 <button
                   onClick={() => onEdit(msg.id, msg.text)}
-                  className="flex items-center gap-2 w-full p-2 text-[11px] font-bold hover:bg-white/5 transition-colors"
+                  className="flex items-center gap-2 w-full text-[11px] font-bold hover:bg-white/5 transition-colors"
                 >
-                  <Edit3 size={14} style={{ color: theme.text2 }} /> EDIT
+                  <Edit3 size={18} style={{ color: theme.text2 }} />
                 </button>
                 <button
                   onClick={async () =>
                     await deleteDoc(doc(db, "rooms", room, "messages", msg.id))
                   }
-                  className="flex items-center gap-2 w-full p-2 text-[11px] font-bold text-red-500 hover:bg-red-500/10 transition-colors"
+                  className="flex items-center gap-2 w-full text-[11px] font-bold text-red-500 hover:bg-red-500/10 transition-colors"
                 >
-                  <Trash2 size={14} /> DELETE
+                  <Trash2 size={18} />
                 </button>
               </PopoverContent>
             )}
