@@ -1,34 +1,63 @@
-# Firebase Chat App
+# Firebase Chat App (PWA)
 
-A real-time chat application built with Next.js, Firebase, and TypeScript. Features Google authentication, multiple chat rooms, and a modern dark/light theme interface.
+A real-time, privacy-focused chat application built with Next.js 15, Firebase, and TypeScript. Features Google authentication, end-to-end encryption on demand, audio voice notes, rich media previews, native browser notifications, customizable wallpapers, and Progressive Web App (PWA) offline support.
 
-## Features
+## 🚀 Key Features
 
-- 🔐 **Google Authentication** - Secure sign-in with Firebase Auth
-- 💬 **Real-time Chat** - Instant messaging with Firestore
-- 🏠 **Multiple Rooms** - Create and join different chat rooms
-- 🌙 **Dark/Light Mode** - Toggle between themes with next-themes
-- 📱 **Responsive Design** - Works on desktop and mobile
-- 🎨 **Modern UI** - Built with Tailwind CSS and Radix UI components
+- 🔐 **Google Authentication** - Secure sign-in with Firebase Auth.
+- 🔒 **On-Demand End-to-End Encryption** - AES-GCM 256-bit client-side encryption using PBKDF2 passphrase key derivation.
+- 💬 **Real-time Messaging** - Instant live chat powered by Firebase Firestore.
+- 🎙️ **Voice Notes** - Record, preview, and play audio voice notes directly inside the chat interface.
+- 📸 **Media & File Attachments** - Share images, GIFs, and PDF documents.
+- 🔔 **Native Push Notifications** - Background browser notifications when new messages arrive.
+- 🎨 **Theme & Local Wallpapers** - Custom accent colors and upload custom local image wallpapers or URLs.
+- 📱 **PWA & Mobile Responsive** - Installable Progressive Web App with offline caching support (`@ducanh2912/next-pwa`).
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 - **Framework:** Next.js 15.3.2 with App Router
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v4
-- **UI Components:** Radix UI primitives
-- **Authentication:** Firebase Auth
-- **Database:** Firestore
-- **Theme:** next-themes for dark/light mode
+- **UI Primitives:** Radix UI (`Popover`, `DropdownMenu`, etc.)
 - **Icons:** Lucide React
+- **Authentication & Database:** Firebase Auth & Firestore
+- **Security:** Web Crypto API (`SubtleCrypto` for AES-GCM encryption)
+- **PWA Integration:** `@ducanh2912/next-pwa`
 
-## Getting Started
+## 📁 Project Structure
+
+```
+src/
+├── app/               # Next.js App Router pages
+│   ├── rooms/         # Dynamic chat room routes (`/rooms/[room]`)
+│   ├── layout.tsx     # Root layout with PWA manifest & theme providers
+│   └── page.tsx       # Home page & room creation
+├── components/        # React components
+│   ├── chat/          # Modular chat components & barrel exports
+│   │   ├── ChatHeader.tsx    # Header with encryption toggle & settings
+│   │   ├── ChatInput.tsx     # Message input, media attachment & mic recorder
+│   │   ├── MediaPreview.tsx  # Modal preview for images, audio & PDFs
+│   │   ├── MessageBubble.tsx # Message bubble with decryption & media rendering
+│   │   ├── MessageList.tsx   # Auto-scrolling message list container
+│   │   ├── index.ts          # Module export aggregator
+│   │   └── types.ts          # TypeScript types & interfaces
+│   ├── ui/            # Reusable UI components (button, popover, etc.)
+│   ├── Auth.tsx       # Google authentication component
+│   ├── AuthWrapper.tsx# Client-side Auth protection wrapper
+│   ├── ChatUI.tsx     # Chat orchestrator component
+│   └── Theme-provider.tsx
+└── lib/               # Utilities & helpers
+    ├── encryption.ts  # Web Crypto API AES-GCM encryption/decryption helpers
+    ├── firebase.ts    # Firebase app initialization & config
+    └── utils.ts       # Utility helper functions
+```
+
+## 💻 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ installed
-- pnpm package manager
-- Firebase project set up
+- Firebase Project set up with Auth and Firestore enabled
 
 ### Installation
 
@@ -39,7 +68,16 @@ A real-time chat application built with Next.js, Firebase, and TypeScript. Featu
    pnpm install
    ```
 
-3. Set up Firebase configuration in `src/lib/firebase.ts`
+3. Configure environment variables in `.env.local`:
+
+   ```env
+   NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+   ```
 
 4. Run the development server:
 
@@ -47,69 +85,11 @@ A real-time chat application built with Next.js, Firebase, and TypeScript. Featu
    pnpm dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Project Structure
+## 📜 Available Scripts
 
-```
-src/
-├── app/               # Next.js App Router pages
-│   ├── rooms/         # Chat room pages
-│   ├── layout.tsx     # Root layout with providers
-│   └── page.tsx       # Home page
-├── components/        # React components
-│   ├── ui/            # Reusable UI components
-│   ├── Auth.tsx       # Authentication component
-|   |── AuthWrapper.tsx
-│   ├── ChatUI.tsx     # Chat interface
-│   └── Theme-provider.tsx
-└── lib/               # Utilities and actions
-    ├── actions/       # Server actions
-    ├── firebase.ts    # Firebase configuration
-    └── utils.ts       # Helper functions
-```
-
-## Usage
-
-1. **Sign In:** Click the sign-in button and authenticate with Google
-2. **Join Room:** Enter a room name to create or join a chat room
-3. **Chat:** Send messages in real-time with other users
-4. **Theme:** Toggle between light and dark modes using the theme switcher
-
-## Firebase Setup
-
-1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com)
-2. Enable Authentication with Google provider
-3. Create a Firestore database
-4. Add your Firebase config to `src/lib/firebase.ts`
-
-## Available Scripts
-
-- `pnpm dev` - Start development server with Turbopack
-- `pnpm build` - Build for production
+- `pnpm dev` - Start Next.js development server
+- `pnpm build` - Build production bundle & PWA service worker
 - `pnpm start` - Start production server
-- `pnpm lint` - Run ESLint
-
-## Deployment
-
-This app is configured for deployment on Replit. The project includes:
-
-- Automatic dependency installation
-- Development server configuration
-- Firebase hosting setup
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## whats next 
-
-- encryption on demand
-- peerjs
-- notifications
-- testable test each step after completation
-- clean documentation of everything and updated readme etc
+- `pnpm lint` - Run ESLint code checks

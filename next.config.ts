@@ -1,12 +1,7 @@
 import type { NextConfig } from "next";
 import withPWA from "@ducanh2912/next-pwa";
 
-const nextConfig: NextConfig = {
-  swcMinify: true,
-};
-
-export default withPWA({
-  ...nextConfig,
+const pwaConfig = withPWA({
   dest: "public",
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
@@ -16,3 +11,7 @@ export default withPWA({
     skipWaiting: true,
   },
 });
+
+const nextConfig: NextConfig = {};
+
+export default pwaConfig(nextConfig);

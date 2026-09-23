@@ -4,7 +4,7 @@ export interface Message {
   text: string;
   displayName: string;
   photoURL: string;
-  createdAt: any;
+  createdAt: { toDate?: () => Date } | null;
   userId: string;
   mediaType?: "image" | "audio" | "pdf" | "gif";
   mediaData?: string;
