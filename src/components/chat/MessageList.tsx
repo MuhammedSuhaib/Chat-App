@@ -3,7 +3,7 @@
 
 import { useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble";
-import { Message, MessageListProps } from "./types";
+import { MessageListProps } from "./types";
 
 export default function MessageList({
   messages,

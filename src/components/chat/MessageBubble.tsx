@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Lock } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { decryptText } from "@/lib/encryption";
-import { Message, MessageBubbleProps } from "./types";
+import { MessageBubbleProps } from "./types";
 import { MessageActionsMenu } from "./MessageActionsMenu";
 import { MessageAttachment } from "./MessageAttachment";
 import { MessageContent } from "./MessageContent";

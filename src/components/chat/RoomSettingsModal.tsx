@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { AppTheme, RoomSettingsModalProps } from "./types";
+import { RoomSettingsModalProps } from "./types";
 import { ColorPaletteSection } from "./ColorPaletteSection";
 import { WallpaperSection } from "./WallpaperSection";
 
