@@ -117,13 +117,13 @@ body {
 
   --popover-foreground: oklch(0.141 0.005 285.823);
 
-  --primary: oklch(0.21 0.006 285.885);
+  --primary: #f97316;
 
-  --primary-foreground: oklch(0.985 0 0);
+  --primary-foreground: #ffffff;
 
-  --secondary: oklch(0.967 0.001 286.375);
+  --secondary: #fb923c;
 
-  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --secondary-foreground: #000000;
 
   --muted: oklch(0.967 0.001 286.375);
 
@@ -182,13 +182,13 @@ body {
 
   --popover-foreground: oklch(0.985 0 0);
 
-  --primary: oklch(0.92 0.004 286.32);
+  --primary: #f97316;
 
-  --primary-foreground: oklch(0.21 0.006 285.885);
+  --primary-foreground: #ffffff;
 
-  --secondary: oklch(0.274 0.006 286.033);
+  --secondary: #fb923c;
 
-  --secondary-foreground: oklch(0.985 0 0);
+  --secondary-foreground: #000000;
 
   --muted: oklch(0.274 0.006 286.033);
 
@@ -241,3 +241,16 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@utility btn-primary {
+  @apply bg-gradient-to-r from-primary via-secondary to-[#ea580c] text-primary-foreground font-semibold shadow-md shadow-primary/20 border border-primary/30 hover:brightness-110 active:scale-[0.99] transition-all cursor-pointer rounded-lg;
+}
+
+@utility input-primary {
+  @apply bg-zinc-900/90 border border-zinc-800 text-white placeholder-zinc-500 rounded-lg px-3.5 py-2 text-sm outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30 transition-all;
+}
+
+@utility card-primary {
+  @apply bg-zinc-950 border border-primary/20 rounded-xl shadow-xl text-white;
+}
+
