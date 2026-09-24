@@ -3,14 +3,7 @@
 
 import { useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble";
-import { Message, RoomChatProps } from "./types";
-
-// Props for MessageList extending common RoomChatProps
-interface Props extends RoomChatProps {
-  messages: Message[]; // Array of chat messages for the current room
-  cryptoKey: CryptoKey | null; // Active room decryption key, if encryption is unlocked
-  onEdit: (id: string, text: string) => void;
-}
+import { Message, MessageListProps } from "./types";
 
 export default function MessageList({
   messages,
@@ -18,7 +11,7 @@ export default function MessageList({
   theme,
   cryptoKey,
   onEdit,
-}: Props) {
+}: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Automatically scrolls to the bottom whenever a new message is received or added.
