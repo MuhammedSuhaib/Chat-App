@@ -1,4 +1,4 @@
-//? AuthWrapper: gates app behind Google auth using cookie token
+//? AuthWrapper: gates the app behind an auth cookie — shows Auth screen if not authenticated
 "use client";
 
 import { useEffect, useState } from "react";
