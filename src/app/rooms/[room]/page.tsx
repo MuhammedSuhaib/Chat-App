@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import ChatUI from "@/components/ChatUI";
+import { ChatUI } from "@/components";
 
 export default function RoomPage() {
   const params = useParams();

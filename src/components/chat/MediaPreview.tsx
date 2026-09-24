@@ -2,15 +2,7 @@
 "use client";
 
 import { Play, FileText } from "lucide-react";
-import { Preview, BaseChatProps } from "./types";
-
-// Props for MediaPreview extending common BaseChatProps
-interface Props extends BaseChatProps {
-  preview: Preview;
-  onCancel: () => void;
-  onSend: () => void;
-}
-
+import { MediaPreviewProps } from "./types";
 import Image from "next/image";
 
 export default function MediaPreview({
@@ -18,7 +10,7 @@ export default function MediaPreview({
   theme,
   onCancel,
   onSend,
-}: Props) {
+}: MediaPreviewProps) {
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6">
       <div className="bg-zinc-900 border border-white/10 rounded-3xl p-6 max-w-sm w-full shadow-[0_0_50px_rgba(0,0,0,0.5)]">
