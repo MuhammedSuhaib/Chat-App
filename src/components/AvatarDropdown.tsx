@@ -44,6 +44,7 @@ export function UserMenu() {
             alt="avatar"
             width={32}
             height={32}
+            unoptimized
             className="w-8 h-8 rounded-full cursor-pointer"
           />
         </DropdownMenuTrigger>

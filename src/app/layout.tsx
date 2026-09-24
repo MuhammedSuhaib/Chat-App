@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/Theme-provider";
-import { AuthWrapper } from "@/components/AuthWrapper";
-import { UserMenu } from "@/components/AvatarDropdown";
+import { ThemeProvider, AuthWrapper, UserMenu } from "@/components";
 import { APP_NAME } from "@/lib/constants";
 import Link from "next/link";
 import "./globals.css";
@@ -48,7 +46,7 @@ export default function RootLayout({
               <Link href="/">
                 <span className="flex flex-wrap justify-center text-2xl font-bold tracking-wide text-center leading-tight">
                   &lt;
-                  <span className="text-1xl text-purple-400">{APP_NAME}</span>
+                  <span className="text-1xl text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-amber-300 font-extrabold">{APP_NAME}</span>
                   /&gt;
                 </span>
               </Link>
