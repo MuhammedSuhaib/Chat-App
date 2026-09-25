@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL
+    process.env.NEXT_PUBLIC_SITE_URL!
   ),
   manifest: "/manifest.json",
   title: `<${APP_NAME}/>`,
@@ -70,7 +70,9 @@ export default function RootLayout({
               <Link href="/">
                 <span className="flex flex-wrap justify-center text-2xl font-bold tracking-wide text-center leading-tight">
                   &lt;
-                  <span className="text-1xl text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-amber-300 font-extrabold">{APP_NAME}</span>
+                  <span className="text-1xl text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-amber-300 font-extrabold">
+                    {APP_NAME}
+                  </span>
                   /&gt;
                 </span>
               </Link>
