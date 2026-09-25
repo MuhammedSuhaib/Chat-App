@@ -9,7 +9,6 @@ export function MessageAttachment({
   mediaType,
   mediaData,
   fileName,
-  accentColor,
 }: MessageAttachmentProps) {
   if (!mediaType || !mediaData) return null;
 
