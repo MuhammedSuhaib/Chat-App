@@ -1,7 +1,8 @@
 //? MediaPreview Component: modal preview layer for pending media attachments before sending
 "use client";
 
-import { Play, FileText } from "lucide-react";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { MediaPreviewProps } from "./types";
 import Image from "next/image";
 
@@ -11,13 +12,20 @@ export default function MediaPreview({
   onCancel,
   onSend,
 }: MediaPreviewProps) {
+  const [isSending, setIsSending] = useState(false);
+
+  const handleSend = async () => {
+    setIsSending(true);
+    try {
+      await onSend();
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6">
       <div className="bg-zinc-900 border border-white/10 rounded-3xl p-6 max-w-sm w-full shadow-[0_0_50px_rgba(0,0,0,0.5)]">
-        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 text-zinc-500">
-          Encrypted Preview
-        </h2>
-
         {/* Render preview based on media type */}
         {preview.type === "image" || preview.type === "gif" ? (
           <Image
@@ -30,13 +38,11 @@ export default function MediaPreview({
             className="rounded-xl mb-4 max-h-64 w-full object-cover shadow-2xl"
           />
         ) : preview.type === "audio" ? (
-          <div className="p-4 bg-black rounded-xl mb-4 flex flex-col items-center gap-3">
-            <Play size={32} style={{ color: theme.text2 }} />
+          <div className="p-4">
             <audio src={preview.data} controls className="w-full h-10" />
           </div>
         ) : (
           <div className="p-8 bg-black rounded-xl mb-4 text-center">
-            <FileText size={40} className="mx-auto text-red-500 mb-2" />
             {preview.name}
           </div>
         )}
@@ -45,16 +51,25 @@ export default function MediaPreview({
         <div className="flex gap-2">
           <button
             onClick={onCancel}
-            className="flex-1 py-3 bg-zinc-800 rounded-xl font-bold text-[11px] uppercase tracking-widest"
+            disabled={isSending}
+            className="flex-1 py-3 bg-zinc-800 rounded-xl font-bold text-[11px] uppercase tracking-widest disabled:opacity-50"
           >
             Cancel
           </button>
           <button
-            onClick={onSend}
-            className="flex-1 py-3 rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-lg"
+            onClick={handleSend}
+            disabled={isSending}
+            className="flex-1 py-3 rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 disabled:opacity-70"
             style={{ backgroundColor: theme.text2, color: "black" }}
           >
-            Send Now
+            {isSending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              "Send Now"
+            )}
           </button>
         </div>
       </div>

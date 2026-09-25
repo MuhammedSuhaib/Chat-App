@@ -17,7 +17,27 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   manifest: "/manifest.json",
   title: `<${APP_NAME}/>`,
-  description: `A PWA chat app for <${APP_NAME}/>`,
+  description: `An open-source, real-time end-to-end encrypted PWA chat app built with Next.js and Firebase.`,
+  openGraph: {
+    title: `<${APP_NAME}/> - Open-Source Real-time Encrypted Chat`,
+    description: `An open-source, real-time end-to-end encrypted PWA chat app built with Next.js and Firebase.`,
+    siteName: APP_NAME,
+    type: "website",
+    images: [
+      {
+        url: "/cybertalk-logo.png",
+        width: 1200,
+        height: 630,
+        alt: `${APP_NAME} Banner`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `<${APP_NAME}/> - Open-Source Real-time Encrypted Chat`,
+    description: `An open-source, real-time end-to-end encrypted PWA chat app built with Next.js and Firebase.`,
+    images: ["/cybertalk-logo.png"],
+  },
 };
 
 export default function RootLayout({

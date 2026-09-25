@@ -2,14 +2,13 @@
 "use client";
 
 import Image from "next/image";
-import { Play, FileText, Download } from "lucide-react";
+import { FileText, Download } from "lucide-react";
 import { MessageAttachmentProps } from "./types";
 
 export function MessageAttachment({
   mediaType,
   mediaData,
   fileName,
-  accentColor,
 }: MessageAttachmentProps) {
   if (!mediaType || !mediaData) return null;
 
@@ -38,17 +37,11 @@ export function MessageAttachment({
       )}
 
       {mediaType === "audio" && (
-        <div className="flex items-center gap-3 p-2 bg-white/5 rounded-xl mb-1">
-          <Play
-            size={16}
-            style={{ fill: accentColor, color: accentColor }}
-          />
           <audio
             src={mediaData}
             controls
-            className="h-8 opacity-70 max-w-full"
+            className="h-8 px-2 opacity-70 max-w-full"
           />
-        </div>
       )}
 
       {mediaType === "pdf" && (

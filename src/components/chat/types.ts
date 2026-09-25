@@ -86,7 +86,7 @@ export interface MessageAttachmentProps {
   mediaType?: "image" | "audio" | "pdf" | "gif";
   mediaData: string;
   fileName?: string;
-  accentColor: string;
+  accentColor?: string;
 }
 
 // Props for MessageBubble component extending RoomChatProps.
