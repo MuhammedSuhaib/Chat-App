@@ -87,8 +87,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(data, {
       headers: {
-        // Cache preview for 1 hour at the CDN edge
-        "Cache-Control": "public, max-age=3600, s-maxage=3600",
+        // Cache per precise URL; instruct browser/shared cache not to share preview across different sites
+        "Cache-Control": "public, max-age=60, s-maxage=60, stale-while-revalidate=300",
+        "Vary": "Accept-Encoding",
       },
     });
   } catch {

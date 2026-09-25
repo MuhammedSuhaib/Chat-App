@@ -118,6 +118,7 @@ export default function ChatUI({ room }: { room: string }) {
         editingId={editingId}
         theme={theme}
         isRecording={isRecording}
+        isSending={isUploading}
         onSend={() => handleAction()}
         onStartRecord={startRecording}
         onStopRecord={stopRecording}

@@ -135,6 +135,7 @@ export interface ChatInputProps extends BaseChatProps {
   setInput: (v: string) => void;
   editingId: string | null;
   isRecording: boolean;
+  isSending?: boolean;
   onSend: () => void;
   onStartRecord: () => void;
   onStopRecord: () => void;

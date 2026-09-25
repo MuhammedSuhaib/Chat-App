@@ -28,28 +28,41 @@ A real-time, privacy-focused chat application built with Next.js 15, Firebase, a
 
 ```
 src/
-├── app/               # Next.js App Router pages
-│   ├── rooms/         # Dynamic chat room routes (`/rooms/[room]`)
-│   ├── layout.tsx     # Root layout with PWA manifest & theme providers
-│   └── page.tsx       # Home page & room creation
-├── components/        # React components
-│   ├── chat/          # Modular chat components & barrel exports
-│   │   ├── ChatHeader.tsx    # Header with encryption toggle & settings
-│   │   ├── ChatInput.tsx     # Message input, media attachment & mic recorder
-│   │   ├── MediaPreview.tsx  # Modal preview for images, audio & PDFs
-│   │   ├── MessageBubble.tsx # Message bubble with decryption & media rendering
-│   │   ├── MessageList.tsx   # Auto-scrolling message list container
-│   │   ├── index.ts          # Module export aggregator
-│   │   └── types.ts          # TypeScript types & interfaces
-│   ├── ui/            # Reusable UI components (button, popover, etc.)
-│   ├── Auth.tsx       # Google authentication component
-│   ├── AuthWrapper.tsx# Client-side Auth protection wrapper
-│   ├── ChatUI.tsx     # Chat orchestrator component
+├── app/                  # Next.js App Router pages & API routes
+│   ├── api/
+│   │   └── og/           # OpenGraph link preview metadata API route
+│   ├── rooms/            # Dynamic chat room routes (`/rooms/[room]`)
+│   ├── layout.tsx        # Root layout with PWA manifest & theme providers
+│   └── page.tsx          # Home page & room creation
+├── components/           # React components
+│   ├── auth/             # Authentication forms & handlers
+│   ├── chat/             # Modular chat components & barrel exports
+│   │   ├── ChatHeader.tsx          # Header with encryption toggle & settings
+│   │   ├── ChatInput.tsx           # Message input, media attachment & mic recorder
+│   │   ├── ColorPaletteSection.tsx # Color theme selector
+│   │   ├── LinkPreview.tsx         # OpenGraph metadata preview for links
+│   │   ├── MediaMenuPopover.tsx    # Media upload popover menu
+│   │   ├── MediaPreview.tsx        # Modal preview for images, audio & PDFs
+│   │   ├── MessageActionsMenu.tsx  # Context menu for message actions
+│   │   ├── MessageAttachment.tsx   # Attachment renderer
+│   │   ├── MessageBubble.tsx       # Message bubble with decryption & media rendering
+│   │   ├── MessageContent.tsx      # Render message text & links
+│   │   ├── MessageList.tsx         # Auto-scrolling message list container
+│   │   ├── RoomSettingsModal.tsx   # Room configuration modal
+│   │   ├── WallpaperSection.tsx    # Wallpaper customization options
+│   │   ├── index.ts                # Module export aggregator
+│   │   └── types.ts                # TypeScript types & interfaces
+│   ├── encryption/       # Web Crypto API encryption hooks & components
+│   ├── ui/               # Reusable UI components (button, popover, etc.)
+│   ├── AvatarDropdown.tsx # User avatar & account menu
+│   ├── ChatUI.tsx        # Chat orchestrator component
 │   └── Theme-provider.tsx
-└── lib/               # Utilities & helpers
-    ├── encryption.ts  # Web Crypto API AES-GCM encryption/decryption helpers
-    ├── firebase.ts    # Firebase app initialization & config
-    └── utils.ts       # Utility helper functions
+├── hooks/                # Custom React hooks (audio recording, room messages)
+└── lib/                  # Utilities, actions & Firebase helpers
+    ├── actions/          # Server actions for room creation/fetching
+    ├── encryption.ts     # Web Crypto API AES-GCM encryption/decryption helpers
+    ├── firebase.ts       # Firebase app initialization & config
+    └── utils.ts          # Utility helper functions
 ```
 
 ## 💻 Getting Started
