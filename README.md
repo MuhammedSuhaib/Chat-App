@@ -1,21 +1,99 @@
-# Firebase Chat App (PWA)
+<h1 align="center">🔐 Encrypted Realtime Chat</h1>
 
-A real-time, privacy-focused chat application built with Next.js 15, Firebase, and TypeScript. Features Google authentication, end-to-end encryption on demand, audio voice notes, rich media previews, native browser notifications, customizable wallpapers, and Progressive Web App (PWA) offline support.
+<p align="center">
+  <img src="public/cybertalk-logo.png" alt="CyberTalk Logo" width="100%" style="border-radius: 12px;" />
+</p>
 
-## 🚀 Key Features
+<h3 align="center">Privacy-first realtime messaging with client-side encryption you control.</h3>
 
-- 🔐 **Google Authentication** - Secure sign-in with Firebase Auth.
-- 🔒 **On-Demand End-to-End Encryption** - AES-GCM 256-bit client-side encryption using PBKDF2 passphrase key derivation.
-- 💬 **Real-time Messaging** - Instant live chat powered by Firebase Firestore.
-- 🎙️ **Voice Notes** - Record, preview, and play audio voice notes directly inside the chat interface.
-- 📸 **Media & File Attachments** - Share images, GIFs, and PDF documents.
-- 🔔 **Native Push Notifications** - Background browser notifications when new messages arrive.
-- 🎨 **Theme & Local Wallpapers** - Custom accent colors and upload custom local image wallpapers or URLs.
-- 📱 **PWA & Mobile Responsive** - Installable Progressive Web App with offline caching support (`@ducanh2912/next-pwa`).
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase" />
+</p>
 
-## 🛠️ Tech Stack
+<p align="center">
+  <img src="https://img.shields.io/badge/🔒_E2E_Encryption-AES--GCM-brightgreen?style=flat-square" />
+  <img src="https://img.shields.io/badge/⚡_Realtime-Firestore-orange?style=flat-square" />
+  <img src="https://img.shields.io/badge/📱_PWA-Installable-blueviolet?style=flat-square" />
+  <img src="https://img.shields.io/badge/🎙️_Voice_Notes-Supported-yellow?style=flat-square" />
+  <img src="https://img.shields.io/github/stars/MuhammedSuhaib/cybertalk?style=flat-square" />
+</p>
 
-- **Framework:** Next.js 15.3.2 with App Router
+<p align="center">
+  <a href="https://cyberdevs.netlify.app"><strong>🚀 Live Demo</strong></a> ·
+  <a href="#-getting-started">Getting Started</a> ·
+  <a href="#-contributing">Contributing</a>
+</p>
+
+---
+
+### 📸 Preview
+
+<p align="center">
+  <img src="public/demo.gif" alt="App Demo" width="90%" style="border-radius: 12px;" />
+</p>
+
+> I will add demo soon
+
+---
+
+### 👋 Welcome
+
+Most chat apps either store your messages in plaintext or bury encryption behind complicated setups.
+
+This one gives you **real-time speed + optional military-grade client-side encryption** — toggle it when you need privacy, keep the smooth experience when you don't.
+
+Built as an open-source project so anyone can inspect the crypto, learn from the code, or deploy their own private instance.
+
+---
+
+### 🤔 Why this instead of other chats?
+
+| Problem with most apps | How this solves it |
+| ------------------------------ | ----------------------------------------------- |
+| Server can read your messages | Encryption happens **in the browser** before anything is sent |
+| Encryption is always-on & heavy | On-demand toggle — use it only when you need it |
+| Complicated key exchange | Simple passphrase + room name (PBKDF2) |
+| Bloated or closed-source | Clean, modern, fully open-source codebase |
+| No voice / media / PWA | Voice notes, images, GIFs, PDFs, installable PWA |
+
+---
+
+### 🔑 Encryption Modes
+
+| Feature | 🔒 Encryption ON | 🔓 Encryption OFF |
+| --------- | ------------------- | --------------------- |
+| **Text Messages** | Encrypted in browser before sending; server sees only ciphertext | Sent in plaintext for instant processing |
+| **Media & Files** | Image, GIF, PDF, and audio payloads encrypted client-side | Uploaded directly as plain media data |
+| **Security & Privacy** | Passphrase never leaves your client; decryption requires shared key | Fast & seamless chat without key entry |
+
+---
+
+### 🧩 How Encryption Works
+
+```mermaid
+sequenceDiagram
+    participant A as Client A (Browser)
+    participant F as Firestore (Server)
+    participant B as Client B (Browser)
+
+    A->>A: Derive AES key from passphrase (PBKDF2)
+    A->>A: Encrypt message (AES-GCM)
+    A->>F: Send ciphertext only
+    F->>B: Deliver ciphertext
+    B->>B: Derive same key from shared passphrase
+    B->>B: Decrypt message locally
+```
+
+The server **never sees plaintext or the encryption key** — both stay in the browser.
+
+---
+
+### 🛠️ Tech Stack
+
+- **Framework:** Next.js 15.3 with App Router
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS v4
 - **UI Primitives:** Radix UI (`Popover`, `DropdownMenu`, etc.)
@@ -24,64 +102,60 @@ A real-time, privacy-focused chat application built with Next.js 15, Firebase, a
 - **Security:** Web Crypto API (`SubtleCrypto` for AES-GCM encryption)
 - **PWA Integration:** `@ducanh2912/next-pwa`
 
-## 📁 Project Structure
+---
+
+### 📁 Project Structure
 
 ```
 src/
 ├── app/                  # Next.js App Router pages & API routes
-│   ├── api/
-│   │   └── og/           # OpenGraph link preview metadata API route
+│   ├── api/og/           # OpenGraph metadata generator API route
 │   ├── rooms/            # Dynamic chat room routes (`/rooms/[room]`)
 │   ├── layout.tsx        # Root layout with PWA manifest & theme providers
-│   └── page.tsx          # Home page & room creation
-├── components/           # React components
-│   ├── auth/             # Authentication forms & handlers
-│   ├── chat/             # Modular chat components & barrel exports
-│   │   ├── ChatHeader.tsx          # Header with encryption toggle & settings
-│   │   ├── ChatInput.tsx           # Message input, media attachment & mic recorder
-│   │   ├── ColorPaletteSection.tsx # Color theme selector
-│   │   ├── LinkPreview.tsx         # OpenGraph metadata preview for links
-│   │   ├── MediaMenuPopover.tsx    # Media upload popover menu
-│   │   ├── MediaPreview.tsx        # Modal preview for images, audio & PDFs
-│   │   ├── MessageActionsMenu.tsx  # Context menu for message actions
-│   │   ├── MessageAttachment.tsx   # Attachment renderer
-│   │   ├── MessageBubble.tsx       # Message bubble with decryption & media rendering
-│   │   ├── MessageContent.tsx      # Render message text & links
-│   │   ├── MessageList.tsx         # Auto-scrolling message list container
-│   │   ├── RoomSettingsModal.tsx   # Room configuration modal
-│   │   ├── WallpaperSection.tsx    # Wallpaper customization options
-│   │   ├── index.ts                # Module export aggregator
-│   │   └── types.ts                # TypeScript types & interfaces
-│   ├── encryption/       # Web Crypto API encryption hooks & components
-│   ├── ui/               # Reusable UI components (button, popover, etc.)
-│   ├── AvatarDropdown.tsx # User avatar & account menu
-│   ├── ChatUI.tsx        # Chat orchestrator component
-│   └── Theme-provider.tsx
-├── hooks/                # Custom React hooks (audio recording, room messages)
-└── lib/                  # Utilities, actions & Firebase helpers
-    ├── actions/          # Server actions for room creation/fetching
-    ├── encryption.ts     # Web Crypto API AES-GCM encryption/decryption helpers
-    ├── firebase.ts       # Firebase app initialization & config
-    └── utils.ts          # Utility helper functions
+│   └── page.tsx          # Home page & redirect handler
+├── components/           # UI components
+│   ├── auth/             # Login & SignUp components (`LoginForm`, `Auth.tsx`)
+│   ├── chat/             # Modular chat components (`ChatHeader`, `MessageBubble`, etc.)
+│   ├── encryption/       # Encryption hooks & toggle components
+│   ├── ui/               # Reusable UI primitives (`button`, `popover`, etc.)
+│   ├── AvatarDropdown.tsx# User profile menu & avatar dropdown
+│   └── ChatUI.tsx        # Main chat orchestrator component
+├── hooks/                # Custom React hooks (`useRoomMessages`, `useAudioRecorder`)
+└── lib/                  # Core utilities & Firebase helpers
+    ├── actions/          # Server actions (`createRoom`, `getRooms`)
+    ├── encryption.ts     # Web Crypto API AES-GCM encryption helpers
+    └── firebase.ts       # Firebase app initialization & auth provider
 ```
 
-## 💻 Getting Started
+---
 
-### Prerequisites
+### 💻 Getting Started
+
+<details>
+<summary><strong>Prerequisites</strong></summary>
 
 - Node.js 18+ installed
 - Firebase Project set up with Auth and Firestore enabled
 
-### Installation
+</details>
+
+<details open>
+<summary><strong>Installation</strong></summary>
 
 1. Clone this repository
-2. Install dependencies:
+
+   ```bash
+   git clone https://github.com/MuhammedSuhaib/cybertalk.git
+   cd cybertalk
+   ```
+
+2. Install dependencies
 
    ```bash
    pnpm install
    ```
 
-3. Configure environment variables in `.env.local`:
+3. Configure environment variables in `.env.local`
 
    ```env
    NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
@@ -92,7 +166,7 @@ src/
    NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
    ```
 
-4. Run the development server:
+4. Run the development server
 
    ```bash
    pnpm dev
@@ -100,27 +174,35 @@ src/
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 📜 Available Scripts
+</details>
 
-- `pnpm dev` - Start Next.js development server
-- `pnpm build` - Build production bundle & PWA service worker
-- `pnpm start` - Start production server
-- `pnpm lint` - Run ESLint code checks
+---
 
+### 📜 Available Scripts
 
-## NEXT
-- Testing
+| Command       | Description                              |
+|---------------|-------------------------------------------|
+| `pnpm dev`    | Start Next.js development server          |
+| `pnpm build`  | Build production bundle & PWA service worker |
+| `pnpm start`  | Start production server                   |
+| `pnpm lint`   | Run ESLint code checks                    |
 
+---
 
+### 🤝 Contributing
 
+Contributions are welcome! Open an issue or submit a pull request to help improve CyberTalk.
 
+---
 
+### ⭐ Star History
 
+<a href="https://star-history.com/#MuhammedSuhaib/cybertalk&Date">
+  <img src="https://api.star-history.com/svg?repos=MuhammedSuhaib/cybertalk&type=Date" alt="Star History Chart" width="60%" />
+</a>
 
+---
 
-
-
-
-
-
-
+<p align="center">
+  Crafted by <a href="https://github.com/MuhammedSuhaib"><strong>Muhammed Suhaib</strong></a> · Live Demo: <a href="https://cyberdevs.netlify.app">cyberdevs.netlify.app</a>
+</p>

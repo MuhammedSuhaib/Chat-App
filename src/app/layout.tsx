@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL
+  ),
   manifest: "/manifest.json",
   title: `<${APP_NAME}/>`,
   description: `An open-source, real-time end-to-end encrypted PWA chat app built with Next.js and Firebase.`,
@@ -23,6 +26,7 @@ export const metadata: Metadata = {
     description: `An open-source, real-time end-to-end encrypted PWA chat app built with Next.js and Firebase.`,
     siteName: APP_NAME,
     type: "website",
+    url: process.env.NEXT_PUBLIC_SITE_URL,
     images: [
       {
         url: "/cybertalk-logo.png",
